@@ -3,6 +3,7 @@ import Sidebar from "../components/Sidebar";
 import StatCard from "../components/StatCard";
 import TaskCard from "../components/TaskCard";
 import AddTaskModal from "../components/AddTaskModal";
+import "./Auth.css";
 import "./Dashboard.css";
 
 const dummyTasks = [
@@ -36,8 +37,36 @@ const dummyTasks = [
 ];
 
 function Dashboard() {
-  const [tasks] = useState(dummyTasks);
+  const [tasks, setTasks] = useState(dummyTasks);
   const [showModal, setShowModal] = useState(false);
+
+  const addTask = (formData) => {
+    const newTask = {
+      ...formData,
+      id: Date.now(), // temporary unique id; the database will create real ids later
+      status: "PENDING",
+    };
+    setTasks([newTask, ...tasks]);
+  };
+
+  const toggleTask = (id) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              status: task.status === "COMPLETED" ? "PENDING" : "COMPLETED",
+            }
+          : task
+      )
+    );
+  };
+
+  const deleteTask = (id) => {
+    if (window.confirm("Delete this task?")) {
+      setTasks(tasks.filter((task) => task.id !== id));
+    }
+  };
 
   const total = tasks.length;
   const completed = tasks.filter((t) => t.status === "COMPLETED").length;
@@ -64,13 +93,24 @@ function Dashboard() {
         </div>
 
         <div className="task-list">
-          {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} />
-          ))}
+          {tasks.length === 0 ? (
+            <p className="empty-state">No tasks yet. Click "+ Add Task" to create one.</p>
+          ) : (
+            tasks.map((task) => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                onToggle={toggleTask}
+                onDelete={deleteTask}
+              />
+            ))
+          )}
         </div>
       </main>
 
-      {showModal && <AddTaskModal onClose={() => setShowModal(false)} />}
+      {showModal && (
+        <AddTaskModal onClose={() => setShowModal(false)} onSave={addTask} />
+      )}
     </div>
   );
 }

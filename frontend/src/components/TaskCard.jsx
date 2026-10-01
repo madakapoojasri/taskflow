@@ -1,9 +1,13 @@
-function TaskCard({ task }) {
+function TaskCard({ task, onToggle, onDelete }) {
   const done = task.status === "COMPLETED";
 
   return (
     <div className={done ? "task-card done" : "task-card"}>
-      <input type="checkbox" checked={done} readOnly />
+      <input
+        type="checkbox"
+        checked={done}
+        onChange={() => onToggle(task.id)}
+      />
 
       <div className="task-info">
         <h3 className="task-title">{task.title}</h3>
@@ -13,8 +17,14 @@ function TaskCard({ task }) {
             {task.priority}
           </span>
           <span className="badge category">{task.category}</span>
-          <span className="task-date">Due {task.dueDate}</span>
+          {task.dueDate && <span className="task-date">Due {task.dueDate}</span>}
         </div>
+      </div>
+
+      <div className="task-actions">
+        <button className="btn-delete" onClick={() => onDelete(task.id)}>
+          Delete
+        </button>
       </div>
     </div>
   );

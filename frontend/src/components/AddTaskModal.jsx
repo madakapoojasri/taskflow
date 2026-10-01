@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function AddTaskModal({ onClose }) {
+function AddTaskModal({ onClose, onSave }) {
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -21,7 +21,7 @@ function AddTaskModal({ onClose }) {
       return;
     }
     // Temporary: Phase 2 will actually add the task
-    console.log("New task:", form);
+    onSave({ ...form, title: form.title.trim() });
     onClose();
   };
 

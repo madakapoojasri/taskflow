@@ -298,3 +298,32 @@
     padding: 20px 16px;
   }
 }
+/* ---------- Task actions & empty state ---------- */
+.task-info {
+  flex: 1;
+}
+
+.task-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-delete {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--danger);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  background: #fee2e2;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--muted);
+  padding: 40px 0;
+}
