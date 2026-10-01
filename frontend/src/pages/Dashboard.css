@@ -341,3 +341,70 @@
 .btn-edit:hover {
   background: rgba(79, 70, 229, 0.1);
 }
+
+/* ---------- Search, sort and filters ---------- */
+.toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--card);
+  color: var(--text);
+}
+
+.search-input:focus,
+.toolbar-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.toolbar-select {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.chip {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--primary);
+}
+
+.chip.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+  }
+}

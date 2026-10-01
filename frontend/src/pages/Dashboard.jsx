@@ -36,10 +36,74 @@ const dummyTasks = [
   },
 ];
 
+const FILTERS = [
+  "All",
+  "Pending",
+  "Completed",
+  "Overdue",
+  "Today",
+  "High Priority",
+];
+
+const SORTS = ["Newest", "Oldest", "Due Date", "Priority"];
+
+const PRIORITY_ORDER = { HIGH: 0, MEDIUM: 1, LOW: 2 };
+
+// Today's date as "YYYY-MM-DD" in the user's local time zone
+const getToday = () => {
+  const d = new Date();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${month}-${day}`;
+};
+
+const matchesFilter = (task, filter, today) => {
+  switch (filter) {
+    case "Pending":
+      return task.status === "PENDING";
+    case "Completed":
+      return task.status === "COMPLETED";
+    case "Overdue":
+      return (
+        task.status === "PENDING" && task.dueDate && task.dueDate < today
+      );
+    case "Today":
+      return task.dueDate === today;
+    case "High Priority":
+      return task.priority === "HIGH";
+    default:
+      return true; // "All"
+  }
+};
+
+const sortTasks = (list, sort) => {
+  const sorted = [...list]; // copy, so we never change the original array
+
+  switch (sort) {
+    case "Oldest":
+      return sorted.sort((a, b) => a.id - b.id);
+    case "Due Date":
+      return sorted.sort((a, b) => {
+        if (!a.dueDate) return 1; // tasks without a date go last
+        if (!b.dueDate) return -1;
+        return a.dueDate.localeCompare(b.dueDate);
+      });
+    case "Priority":
+      return sorted.sort(
+        (a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]
+      );
+    default: // "Newest"
+      return sorted.sort((a, b) => b.id - a.id);
+  }
+};
+
 function Dashboard() {
   const [tasks, setTasks] = useState(dummyTasks);
   const [showModal, setShowModal] = useState(false);
   const [editingTask, setEditingTask] = useState(null); 
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("All");
+  const [sort, setSort] = useState("Newest");
 
   const addTask = (formData) => {
     const newTask = {
@@ -89,6 +153,19 @@ function Dashboard() {
     setEditingTask(null);
   };
 
+  const today = getToday();
+  const query = search.trim().toLowerCase();
+
+  const visibleTasks = sortTasks(
+    tasks.filter((task) => {
+      const matchesSearch =
+        task.title.toLowerCase().includes(query) ||
+        (task.description || "").toLowerCase().includes(query);
+      return matchesSearch && matchesFilter(task, filter, today);
+    }),
+    sort
+  );
+
   const total = tasks.length;
   const completed = tasks.filter((t) => t.status === "COMPLETED").length;
   const pending = total - completed;
@@ -111,6 +188,41 @@ function Dashboard() {
           <button className="btn-add" onClick={openAddModal}>
             + Add Task
           </button>
+        </div>
+
+        <div className="toolbar">
+          <input
+            className="search-input"
+            type="text"
+            placeholder="🔍 Search tasks..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+          <select
+            className="toolbar-select"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            aria-label="Sort tasks"
+          >
+            {SORTS.map((s) => (
+              <option key={s} value={s}>
+                Sort: {s}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="filter-chips">
+          {FILTERS.map((f) => (
+            <button
+              key={f}
+              className={f === filter ? "chip active" : "chip"}
+              onClick={() => setFilter(f)}
+            >
+              {f}
+            </button>
+          ))}
         </div>
 
         <div className="task-list">
