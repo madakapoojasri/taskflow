@@ -39,6 +39,7 @@ const dummyTasks = [
 function Dashboard() {
   const [tasks, setTasks] = useState(dummyTasks);
   const [showModal, setShowModal] = useState(false);
+  const [editingTask, setEditingTask] = useState(null); 
 
   const addTask = (formData) => {
     const newTask = {
@@ -67,6 +68,26 @@ function Dashboard() {
       setTasks(tasks.filter((task) => task.id !== id));
     }
   };
+  const updateTask = (id, formData) => {
+    setTasks(
+      tasks.map((task) => (task.id === id ? { ...task, ...formData } : task))
+    );
+  };
+
+  const openAddModal = () => {
+    setEditingTask(null);
+    setShowModal(true);
+  };
+
+  const openEditModal = (task) => {
+    setEditingTask(task);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setEditingTask(null);
+  };
 
   const total = tasks.length;
   const completed = tasks.filter((t) => t.status === "COMPLETED").length;
@@ -87,7 +108,7 @@ function Dashboard() {
 
         <div className="tasks-header">
           <h2>My Tasks</h2>
-          <button className="btn-add" onClick={() => setShowModal(true)}>
+          <button className="btn-add" onClick={openAddModal}>
             + Add Task
           </button>
         </div>
@@ -102,6 +123,7 @@ function Dashboard() {
                 task={task}
                 onToggle={toggleTask}
                 onDelete={deleteTask}
+                onEdit={openEditModal}
               />
             ))
           )}
@@ -109,7 +131,12 @@ function Dashboard() {
       </main>
 
       {showModal && (
-        <AddTaskModal onClose={() => setShowModal(false)} onSave={addTask} />
+        <AddTaskModal
+          task={editingTask}
+          onClose={closeModal}
+          onSave={addTask}
+          onUpdate={updateTask}
+        />
       )}
     </div>
   );

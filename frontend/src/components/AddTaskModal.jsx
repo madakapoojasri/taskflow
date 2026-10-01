@@ -1,12 +1,13 @@
 import { useState } from "react";
 
-function AddTaskModal({ onClose, onSave }) {
+function AddTaskModal({ task, onClose, onSave, onUpdate }) {
+  const isEditing = task !== null;
   const [form, setForm] = useState({
-    title: "",
-    description: "",
-    category: "College",
-    priority: "MEDIUM",
-    dueDate: "",
+    title: task?.title ?? "",
+    description: task?.description ?? "",
+    category: task?.category ?? "College",
+    priority: task?.priority ?? "MEDIUM",
+    dueDate: task?.dueDate ?? "",
   });
   const [error, setError] = useState("");
 
@@ -21,14 +22,20 @@ function AddTaskModal({ onClose, onSave }) {
       return;
     }
     // Temporary: Phase 2 will actually add the task
-    onSave({ ...form, title: form.title.trim() });
+    const cleaned = { ...form, title: form.title.trim() };
+
+    if (isEditing) {
+      onUpdate(task.id, cleaned);
+    } else {
+      onSave(cleaned);
+    }
     onClose();
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2>Add Task</h2>
+        <h2>{isEditing ? "Edit Task" : "Add Task"}</h2>
 
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">
@@ -105,7 +112,7 @@ function AddTaskModal({ onClose, onSave }) {
               Cancel
             </button>
             <button type="submit" className="btn-save">
-              Save Task
+              {isEditing ? "Save Changes" : "Save Task"}
             </button>
           </div>
         </form>

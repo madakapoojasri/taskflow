@@ -1,4 +1,4 @@
-function TaskCard({ task, onToggle, onDelete }) {
+function TaskCard({ task, onToggle, onDelete, onEdit }) {
   const done = task.status === "COMPLETED";
 
   return (
@@ -22,6 +22,9 @@ function TaskCard({ task, onToggle, onDelete }) {
       </div>
 
       <div className="task-actions">
+        <button className="btn-edit" onClick={() => onEdit(task)}>
+          Edit
+        </button>
         <button className="btn-delete" onClick={() => onDelete(task.id)}>
           Delete
         </button>

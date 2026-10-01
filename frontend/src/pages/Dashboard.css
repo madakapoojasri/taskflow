@@ -327,3 +327,17 @@
   color: var(--muted);
   padding: 40px 0;
 }
+
+.btn-edit {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--primary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-edit:hover {
+  background: rgba(79, 70, 229, 0.1);
+}
