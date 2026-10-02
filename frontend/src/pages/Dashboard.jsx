@@ -1,42 +1,16 @@
-import { useAuth } from "../context/authContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import StatCard from "../components/StatCard";
 import TaskCard from "../components/TaskCard";
 import AddTaskModal from "../components/AddTaskModal";
+import { useAuth } from "../context/authContext";
+import * as taskService from "../services/taskService";
+import { getErrorMessage } from "../services/api";
 import "./Auth.css";
 import "./Dashboard.css";
 
-const dummyTasks = [
-  {
-    id: 1,
-    title: "Complete React project",
-    description: "Finish the dashboard UI",
-    category: "Coding",
-    priority: "HIGH",
-    dueDate: "2026-10-05",
-    status: "PENDING",
-  },
-  {
-    id: 2,
-    title: "Finish CN assignment",
-    description: "Routing algorithms",
-    category: "College",
-    priority: "MEDIUM",
-    dueDate: "2026-10-03",
-    status: "COMPLETED",
-  },
-  {
-    id: 3,
-    title: "Buy groceries",
-    description: "",
-    category: "Shopping",
-    priority: "LOW",
-    dueDate: "2026-10-02",
-    status: "PENDING",
-  },
-];
-
+// ===== KEEP: paste your FILTERS, SORTS, PRIORITY_ORDER, getToday,
+// ===== matchesFilter and sortTasks here, exactly as before.
 const FILTERS = [
   "All",
   "Pending",
@@ -99,45 +73,80 @@ const sortTasks = (list, sort) => {
 };
 
 function Dashboard() {
-  const [tasks, setTasks] = useState(dummyTasks);
+  const { user } = useAuth();
+
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
+
   const [showModal, setShowModal] = useState(false);
-  const [editingTask, setEditingTask] = useState(null); 
+  const [editingTask, setEditingTask] = useState(null);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [sort, setSort] = useState("Newest");
-  const { user } = useAuth();
 
-  const addTask = (formData) => {
-    const newTask = {
-      ...formData,
-      id: Date.now(), // temporary unique id; the database will create real ids later
-      status: "PENDING",
+  // Load tasks when the page opens (and again when the user clicks Retry)
+  useEffect(() => {
+    let cancelled = false;
+
+    taskService
+      .getTasks()
+      .then((data) => {
+        if (!cancelled) {
+          setTasks(data);
+          setLoadError("");
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) setLoadError(getErrorMessage(err));
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
     };
-    setTasks([newTask, ...tasks]);
+  }, [reloadKey]);
+
+  const retryLoad = () => {
+    setLoading(true);
+    setReloadKey((k) => k + 1);
   };
 
-  const toggleTask = (id) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              status: task.status === "COMPLETED" ? "PENDING" : "COMPLETED",
-            }
-          : task
-      )
-    );
+  // These two THROW on failure, so the modal can show the error
+  const addTask = async (data) => {
+    const created = await taskService.createTask(data);
+    setTasks((prev) => [created, ...prev]);
   };
 
-  const deleteTask = (id) => {
-    if (window.confirm("Delete this task?")) {
-      setTasks(tasks.filter((task) => task.id !== id));
+  const updateTask = async (id, data) => {
+    const updated = await taskService.updateTask(id, data);
+    setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+  };
+
+  // These two show errors in a banner on the page
+  const toggleTask = async (id) => {
+    setActionError("");
+    try {
+      const updated = await taskService.toggleTask(id);
+      setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+    } catch (err) {
+      setActionError(getErrorMessage(err));
     }
   };
-  const updateTask = (id, formData) => {
-    setTasks(
-      tasks.map((task) => (task.id === id ? { ...task, ...formData } : task))
-    );
+
+  const deleteTask = async (id) => {
+    if (!window.confirm("Delete this task?")) return;
+    setActionError("");
+    try {
+      await taskService.deleteTask(id);
+      setTasks((prev) => prev.filter((t) => t.id !== id));
+    } catch (err) {
+      setActionError(getErrorMessage(err));
+    }
   };
 
   const openAddModal = () => {
@@ -192,6 +201,8 @@ function Dashboard() {
           </button>
         </div>
 
+        {actionError && <p className="error-banner">❌ {actionError}</p>}
+
         <div className="toolbar">
           <input
             className="search-input"
@@ -228,10 +239,23 @@ function Dashboard() {
         </div>
 
         <div className="task-list">
-          {tasks.length === 0 ? (
-            <p className="empty-state">No tasks yet. Click "+ Add Task" to create one.</p>
+          {loading ? (
+            <p className="empty-state">Loading tasks...</p>
+          ) : loadError ? (
+            <div className="empty-state">
+              <p className="error-banner">⚠ {loadError}</p>
+              <button className="btn-secondary" onClick={retryLoad}>
+                Try again
+              </button>
+            </div>
+          ) : tasks.length === 0 ? (
+            <p className="empty-state">
+              No tasks yet. Click "+ Add Task" to create one.
+            </p>
+          ) : visibleTasks.length === 0 ? (
+            <p className="empty-state">No tasks match your search or filter.</p>
           ) : (
-            tasks.map((task) => (
+            visibleTasks.map((task) => (
               <TaskCard
                 key={task.id}
                 task={task}

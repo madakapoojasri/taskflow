@@ -408,3 +408,13 @@
     flex-direction: column;
   }
 }
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.empty-state .error-banner {
+  display: inline-block;
+  margin-bottom: 14px;
+}
