@@ -1,8 +1,13 @@
+import { useAuth } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
 
 function Sidebar() {
   const navigate = useNavigate();
-
+  const { logout } = useAuth();
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
   const links = ["Dashboard", "My Tasks", "Categories", "Settings"];
 
   return (
@@ -20,7 +25,7 @@ function Sidebar() {
         ))}
       </nav>
 
-      <button className="nav-item logout" onClick={() => navigate("/login")}>
+      <button className="nav-item logout" onClick={handleLogout}>
         Logout
       </button>
     </aside>

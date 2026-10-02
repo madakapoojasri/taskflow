@@ -1,3 +1,5 @@
+import { useAuth } from "../context/authContext";
+import { getErrorMessage } from "../services/api";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Auth.css";
@@ -5,6 +7,9 @@ import "./Auth.css";
 function Login() {
   const navigate = useNavigate();
 
+  const { login } = useAuth();
+  const [serverError, setServerError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -23,14 +28,21 @@ function Login() {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validate();
     setErrors(newErrors);
+    setServerError("");
+    if (Object.keys(newErrors).length > 0) return;
 
-    if (Object.keys(newErrors).length === 0) {
-      // Temporary: no backend yet, so just go to the dashboard
+    setLoading(true);
+    try {
+      await login(email.trim(), password);
       navigate("/dashboard");
+    } catch (err) {
+      setServerError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,8 +86,10 @@ function Login() {
             {errors.password && <p className="error-text">{errors.password}</p>}
           </div>
 
-          <button type="submit" className="btn-primary">
-            Login
+          {serverError && <p className="error-banner">❌ {serverError}</p>}
+
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 

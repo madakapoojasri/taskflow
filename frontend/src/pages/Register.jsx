@@ -1,9 +1,14 @@
+import { useAuth } from "../context/authContext";
+import { getErrorMessage } from "../services/api";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Auth.css";
 
 function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
+  const [serverError, setServerError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -48,14 +53,26 @@ function Register() {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validate();
     setErrors(newErrors);
+    setServerError("");
+    if (Object.keys(newErrors).length > 0) return;
 
-    if (Object.keys(newErrors).length === 0) {
-      // Temporary: no backend yet, so go to the login page
-      navigate("/login");
+    setLoading(true);
+    try {
+      await register(form.name.trim(), form.email.trim(), form.password);
+      navigate("/dashboard"); // the backend logs the new user in straight away
+    } catch (err) {
+      const fieldErrors = err.response?.data?.errors;
+      if (fieldErrors) {
+        setErrors(fieldErrors); // e.g. { email: "Enter a valid email" }
+      } else {
+        setServerError(getErrorMessage(err));
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -129,8 +146,10 @@ function Register() {
             )}
           </div>
 
-          <button type="submit" className="btn-primary">
-            Create Account
+          {serverError && <p className="error-banner">❌ {serverError}</p>}
+
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? "Creating account..." : "Create Account"}
           </button>
         </form>
 

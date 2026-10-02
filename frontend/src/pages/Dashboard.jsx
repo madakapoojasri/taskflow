@@ -1,3 +1,4 @@
+import { useAuth } from "../context/authContext";
 import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import StatCard from "../components/StatCard";
@@ -104,6 +105,7 @@ function Dashboard() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [sort, setSort] = useState("Newest");
+  const { user } = useAuth();
 
   const addTask = (formData) => {
     const newTask = {
@@ -175,7 +177,7 @@ function Dashboard() {
       <Sidebar />
 
       <main className="main">
-        <h1 className="greeting">Good morning! 👋</h1>
+        <h1 className="greeting">Hello, {user?.name}! 👋</h1>
 
         <div className="stats">
           <StatCard label="Total" value={total} />
