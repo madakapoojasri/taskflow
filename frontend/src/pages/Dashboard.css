@@ -269,35 +269,6 @@
   background: var(--primary-hover);
 }
 
-/* ---------- Basic mobile layout (we'll polish in Phase 6) ---------- */
-@media (max-width: 768px) {
-  .dashboard {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    padding: 12px 16px;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .sidebar-logo {
-    margin-bottom: 0;
-    margin-right: auto;
-  }
-
-  .sidebar-nav {
-    display: none;
-  }
-
-  .main {
-    padding: 20px 16px;
-  }
-}
 /* ---------- Task actions & empty state ---------- */
 .task-info {
   flex: 1;
@@ -446,4 +417,149 @@ button:disabled {
 
 .sidebar .theme-toggle {
   margin-bottom: 8px;
+}
+
+/* ---------- Responsive layout ---------- */
+
+/* Hidden on desktop; the media query below shows them on mobile */
+.mobile-bar,
+.sidebar-backdrop,
+.sidebar-close {
+  display: none;
+}
+
+.task-info {
+  min-width: 0; /* lets long titles wrap instead of overflowing */
+}
+
+.task-title {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    flex-direction: column;
+  }
+
+  /* Top bar with the hamburger button */
+  .mobile-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+  }
+
+  .mobile-bar .sidebar-logo {
+    margin: 0;
+    padding: 0;
+    font-size: 1.2rem;
+  }
+
+  .menu-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 1.3rem;
+    line-height: 1;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  /* The sidebar becomes a drawer that slides in from the left */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 260px;
+    max-width: 80vw;
+    z-index: 40;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-close {
+    display: block;
+    position: absolute;
+    top: 14px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 30;
+  }
+
+  /* Page content */
+  .main {
+    padding: 20px 16px;
+    max-width: 100%;
+  }
+
+  .greeting {
+    font-size: 1.3rem;
+  }
+
+  .stats {
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 14px 8px;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  /* Task card: the buttons move onto their own row */
+  .task-card {
+    flex-wrap: wrap;
+  }
+
+  .task-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* Filter chips scroll sideways instead of wrapping onto many rows */
+  .filter-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+
+  .chip {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* Modal */
+  .modal {
+    padding: 20px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
 }

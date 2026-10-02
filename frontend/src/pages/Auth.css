@@ -130,3 +130,14 @@
   background: #450a0a;
   color: #fca5a5;
 }
+
+@media (max-width: 480px) {
+  .auth-page {
+    padding-top: 64px;
+    align-items: flex-start;
+  }
+
+  .auth-card {
+    padding: 28px 20px;
+  }
+}
