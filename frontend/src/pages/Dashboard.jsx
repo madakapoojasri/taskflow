@@ -8,6 +8,9 @@ import * as taskService from "../services/taskService";
 import { getErrorMessage } from "../services/api";
 import "./Auth.css";
 import "./Dashboard.css";
+import SkeletonList from "../components/SkeletonList";
+import EmptyState from "../components/EmptyState";
+import { useToast } from "../context/toastContext";
 
 // ===== KEEP: paste your FILTERS, SORTS, PRIORITY_ORDER, getToday,
 // ===== matchesFilter and sortTasks here, exactly as before.
@@ -74,11 +77,11 @@ const sortTasks = (list, sort) => {
 
 function Dashboard() {
   const { user } = useAuth();
+  const toast = useToast();
 
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
-  const [actionError, setActionError] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
 
   const [showModal, setShowModal] = useState(false);
@@ -120,19 +123,25 @@ function Dashboard() {
   const addTask = async (data) => {
     const created = await taskService.createTask(data);
     setTasks((prev) => [created, ...prev]);
+    toast.success("Task added");
   };
 
   const updateTask = async (id, data) => {
     const updated = await taskService.updateTask(id, data);
     setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+    toast.success("Task updated");
   };
 
   // These two show errors in a banner on the page
   const toggleTask = async (id) => {
-    setActionError("");
     try {
       const updated = await taskService.toggleTask(id);
       setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+      toast.success(
+        updated.status === "COMPLETED"
+          ? "Task completed 🎉"
+          : "Task moved back to pending"
+      );
     } catch (err) {
       setActionError(getErrorMessage(err));
     }
@@ -140,13 +149,18 @@ function Dashboard() {
 
   const deleteTask = async (id) => {
     if (!window.confirm("Delete this task?")) return;
-    setActionError("");
     try {
       await taskService.deleteTask(id);
       setTasks((prev) => prev.filter((t) => t.id !== id));
+      toast.success("Task deleted");
     } catch (err) {
       setActionError(getErrorMessage(err));
     }
+  };
+
+  const clearFilters = () => {
+    setSearch("");
+    setFilter("All");
   };
 
   const openAddModal = () => {
@@ -189,9 +203,9 @@ function Dashboard() {
         <h1 className="greeting">Hello, {user?.name}! 👋</h1>
 
         <div className="stats">
-          <StatCard label="Total" value={total} />
-          <StatCard label="Pending" value={pending} />
-          <StatCard label="Done" value={completed} />
+          <StatCard label="Total" value={loading ? "–" : total} />
+          <StatCard label="Pending" value={loading ? "–" : pending} />
+          <StatCard label="Done" value={loading ? "–" : completed} />
         </div>
 
         <div className="tasks-header">
@@ -200,8 +214,6 @@ function Dashboard() {
             + Add Task
           </button>
         </div>
-
-        {actionError && <p className="error-banner">❌ {actionError}</p>}
 
         <div className="toolbar">
           <input
@@ -240,20 +252,31 @@ function Dashboard() {
 
         <div className="task-list">
           {loading ? (
-            <p className="empty-state">Loading tasks...</p>
+            <SkeletonList />
           ) : loadError ? (
-            <div className="empty-state">
-              <p className="error-banner">⚠ {loadError}</p>
-              <button className="btn-secondary" onClick={retryLoad}>
-                Try again
-              </button>
-            </div>
+            <EmptyState
+              icon="⚠️"
+              title="Couldn't load your tasks"
+              text={loadError}
+              actionLabel="Try again"
+              onAction={retryLoad}
+            />
           ) : tasks.length === 0 ? (
-            <p className="empty-state">
-              No tasks yet. Click "+ Add Task" to create one.
-            </p>
+            <EmptyState
+              icon="📝"
+              title="No tasks yet"
+              text="Add your first task and start getting things done."
+              actionLabel="+ Add Task"
+              onAction={openAddModal}
+            />
           ) : visibleTasks.length === 0 ? (
-            <p className="empty-state">No tasks match your search or filter.</p>
+            <EmptyState
+              icon="🔍"
+              title="No matching tasks"
+              text="Try a different search or filter."
+              actionLabel="Clear search and filters"
+              onAction={clearFilters}
+            />
           ) : (
             visibleTasks.map((task) => (
               <TaskCard

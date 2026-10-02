@@ -563,3 +563,157 @@ button:disabled {
     gap: 0;
   }
 }
+
+/* ---------- Toasts ---------- */
+.toast-container {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(360px, calc(100vw - 32px));
+  pointer-events: none; /* clicks pass through the empty area */
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  animation: toast-in 0.2s ease-out;
+}
+
+.toast-success {
+  border-left-color: #16a34a;
+}
+
+.toast-error {
+  border-left-color: var(--danger);
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Skeleton loading cards ---------- */
+.skeleton-card {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.skeleton-body {
+  flex: 1;
+}
+
+.skeleton {
+  background: var(--border);
+  border-radius: 6px;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton-box {
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.skeleton-line {
+  height: 12px;
+  width: 70%;
+  margin-bottom: 10px;
+}
+
+.skeleton-line.wide {
+  height: 16px;
+  width: 45%;
+}
+
+.skeleton-line.short {
+  width: 30%;
+  margin-bottom: 0;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* ---------- Empty states ---------- */
+.empty-card {
+  text-align: center;
+  background: var(--card);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 44px 20px;
+}
+
+.empty-icon {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+
+.empty-title {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.empty-text {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 18px;
+}
+
+/* ---------- Layering fix: modal must sit above the mobile top bar ---------- */
+.modal-overlay {
+  z-index: 50;
+}
+
+/* ---------- Respect "reduce motion" settings ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton,
+  .toast {
+    animation: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .toast-container {
+    right: 16px;
+    left: 16px;
+    width: auto;
+    bottom: 12px;
+  }
+}
