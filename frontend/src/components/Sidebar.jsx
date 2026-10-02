@@ -1,5 +1,6 @@
 import { useAuth } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
+import ThemeToggle from "./ThemeToggle";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ function Sidebar() {
         ))}
       </nav>
 
+      <ThemeToggle />
       <button className="nav-item logout" onClick={handleLogout}>
         Logout
       </button>

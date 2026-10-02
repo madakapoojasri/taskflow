@@ -3,6 +3,7 @@ import { getErrorMessage } from "../services/api";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Auth.css";
+import ThemeToggle from "../components/ThemeToggle";
 
 function Register() {
   const navigate = useNavigate();
@@ -78,6 +79,7 @@ function Register() {
 
   return (
     <div className="auth-page">
+      <ThemeToggle floating />
       <div className="auth-card">
         <div className="auth-logo">✓ TaskFlow</div>
         <h2 className="auth-title">Create your account</h2>

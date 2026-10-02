@@ -3,6 +3,7 @@ import { getErrorMessage } from "../services/api";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Auth.css";
+import ThemeToggle from "../components/ThemeToggle";
 
 function Login() {
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ function Login() {
 
   return (
     <div className="auth-page">
+      <ThemeToggle floating />
       <div className="auth-card">
         <div className="auth-logo">✓ TaskFlow</div>
         <h2 className="auth-title">Welcome Back!</h2>

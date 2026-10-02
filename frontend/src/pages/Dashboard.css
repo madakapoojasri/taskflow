@@ -418,3 +418,32 @@ button:disabled {
   display: inline-block;
   margin-bottom: 14px;
 }
+
+/* ---------- Dark mode overrides ---------- */
+:root[data-theme="dark"] .priority-high {
+  background: #450a0a;
+  color: #fca5a5;
+}
+
+:root[data-theme="dark"] .priority-medium {
+  background: #451a03;
+  color: #fcd34d;
+}
+
+:root[data-theme="dark"] .priority-low {
+  background: #052e16;
+  color: #86efac;
+}
+
+:root[data-theme="dark"] .badge.category {
+  background: #1e1b4b;
+  color: #a5b4fc;
+}
+
+:root[data-theme="dark"] .btn-delete:hover {
+  background: #450a0a;
+}
+
+.sidebar .theme-toggle {
+  margin-bottom: 8px;
+}
