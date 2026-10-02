@@ -33,6 +33,16 @@ public class GlobalExceptionHandler {
                 "Invalid request body. Check the JSON format, priority and date values.", null);
     }
 
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailExists(EmailAlreadyExistsException ex) {
+        return build(HttpStatus.CONFLICT, ex.getMessage(), null);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleBadCredentials(InvalidCredentialsException ex) {
+        return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), null);
+    }
+
     private ResponseEntity<Map<String, Object>> build(
             HttpStatus status, String message, Map<String, String> fieldErrors) {
         Map<String, Object> body = new LinkedHashMap<>();
