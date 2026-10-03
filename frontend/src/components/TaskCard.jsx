@@ -16,7 +16,7 @@ function TaskCard({ task, onToggle, onDelete, onEdit }) {
           <span className={`badge priority-${task.priority.toLowerCase()}`}>
             {task.priority}
           </span>
-          <span className="badge category">{task.category}</span>
+          {task.category && <span className="badge category">{task.category}</span>}
           {task.dueDate && <span className="task-date">Due {task.dueDate}</span>}
         </div>
       </div>

@@ -8,7 +8,7 @@ function Sidebar() {
   const { logout } = useAuth();
   const [open, setOpen] = useState(false);
 
-  const links = ["Dashboard", "My Tasks", "Categories", "Settings"];
+  const links = ["Dashboard"];
 
   // Close the drawer with the Escape key
   useEffect(() => {
