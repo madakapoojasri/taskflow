@@ -63,7 +63,7 @@ taskflow/
 ### 1. Clone
 
 ```bash
-git clone https://github.com/your-username/taskflow.git
+git clone https://github.com/madakapoojasri/taskflow.git
 cd taskflow
 ```
 
