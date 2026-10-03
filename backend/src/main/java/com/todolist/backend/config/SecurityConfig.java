@@ -1,6 +1,8 @@
 package com.todolist.backend.config;
 
 import java.util.List;
+import java.util.Arrays;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -38,9 +40,11 @@ public class SecurityConfig {
 
     // Allow the React dev server. We'll add the deployed frontend URL in Phase 8.
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource(
+            @Value("${app.cors.allowed-origins:http://localhost:5173}") String allowedOrigins) {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(
+                Arrays.stream(allowedOrigins.split(",")).map(String::trim).toList());
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
 
